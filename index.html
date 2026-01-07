@@ -2,141 +2,303 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Devoir à Domicile N°3 - Variante 1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Devoir N°3 - Ezher Edition (Final)</title>
     
-    <script>
-      window.MathJax = {
-        tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
-      };
-    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Montserrat:wght@400;600&family=Times+New+Roman&display=swap" rel="stylesheet">
+
+    <script>window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };</script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
-        body { font-family: 'Times New Roman', serif; padding: 40px; max-width: 800px; margin: 0 auto; line-height: 1.5; }
+        /* --- CORE SETUP --- */
+        :root { --accent-color: #E50914; /* Ezher Red */ }
         
-        /* TIMER STYLE */
-        #timer-display {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: #222;
-            color: #fff;
-            padding: 10px 15px;
-            border-radius: 5px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 1.2rem;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            z-index: 1000;
-            border: 2px solid #000;
+        body { 
+            margin: 0; padding: 0; 
+            background: #000; color: #fff; 
+            font-family: sans-serif; 
+            overflow: hidden; /* Locks scroll during intro */
+            -webkit-tap-highlight-color: transparent;
         }
-        .timer-warning { background-color: #b71c1c !important; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-        @media print { #timer-display { display: none; } }
 
-        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; text-align: center; border: 2px solid black; }
-        .header-table td { border: 1px solid black; padding: 10px; font-weight: bold; }
-        h3 { text-decoration: underline; text-align: center; margin-top: 30px; }
+        /* --- INTRO CSS --- */
+        #tap-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 99999;
+            display: flex; justify-content: center; align-items: center; cursor: pointer;
+        }
+        .tap-msg {
+            font-family: 'Courier New', monospace; color: var(--accent-color);
+            border: 1px solid var(--accent-color); padding: 20px 40px;
+            letter-spacing: 2px; font-weight: bold; font-size: 1rem;
+            animation: breathe 2s infinite; text-align: center;
+        }
+        @keyframes breathe { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; box-shadow: 0 0 20px var(--accent-color); } }
+
+        #signature-boot {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 10000;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; pointer-events: none;
+        }
+        .fog-layer {
+            position: absolute; top: 0; left: 0; width: 300%; height: 100%;
+            background: url('https://raw.githubusercontent.com/danielstuart14/CSS_FOG_ANIMATION/master/fog1.png') repeat-x;
+            background-size: cover; opacity: 0.4;
+            animation: fogMove 60s linear infinite; z-index: 1;
+        }
+        @keyframes fogMove { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-200%, 0, 0); } }
+
+        .intro-container {
+            position: relative; z-index: 5;
+            display: flex; flex-direction: column; align-items: center;
+            transition: all 3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .intro-container.morph-active {
+            opacity: 0; filter: blur(30px); transform: scale(1.1);
+        }
+
+        .neon-text {
+            font-family: 'Cinzel', serif; font-weight: 900; font-size: 6rem;
+            color: transparent; letter-spacing: 15px; text-transform: uppercase;
+            -webkit-text-stroke: 2px rgba(255, 255, 255, 0.3);
+            position: relative; opacity: 0;
+            animation: flickerOn 4s linear 1s forwards; 
+        }
+        .neon-text::before {
+            content: 'EZHER'; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            color: var(--accent-color); opacity: 0;
+            text-shadow: 0 0 10px var(--accent-color), 0 0 30px var(--accent-color);
+            transition: opacity 0.5s;
+        }
+        .neon-text.active::before { opacity: 1; animation: pulseGlow 3s infinite alternate; }
+
+        .neon-sub {
+            font-family: 'Montserrat', sans-serif; font-size: 0.9rem; letter-spacing: 10px; color: #fff;
+            margin-top: 20px; opacity: 0; transform: translateY(20px);
+            animation: slideUp 2s ease-out 4s forwards; 
+        }
+        @keyframes flickerOn {
+            0%, 10%, 12%, 15% { opacity: 0; }
+            11%, 13%, 14%, 20% { opacity: 1; text-shadow: 0 0 10px var(--accent-color); }
+            100% { opacity: 1; text-shadow: 0 0 20px var(--accent-color); }
+        }
+        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulseGlow { from { filter: brightness(1); } to { filter: brightness(1.4); } }
+        @media (max-width: 768px) {
+            .neon-text { font-size: 3rem; letter-spacing: 5px; -webkit-text-stroke: 1px rgba(255,255,255,0.5); }
+            .neon-sub { font-size: 0.6rem; letter-spacing: 4px; }
+        }
+
+        /* --- EXAM CONTENT (DARK MODE) --- */
+        #main-content {
+            opacity: 0; display: none; transition: opacity 2s ease-in;
+            font-family: 'Times New Roman', serif;
+            max-width: 850px; margin: 0 auto; padding: 40px;
+        }
+
+        .header-table { 
+            width: 100%; border-collapse: collapse; margin-bottom: 30px; 
+            text-align: center; border: 2px solid var(--accent-color); color: #fff;
+        }
+        .header-table td { border: 1px solid #444; padding: 10px; font-weight: bold; }
+
+        h3 {
+            color: var(--accent-color); border-bottom: 1px solid #333; 
+            padding-bottom: 5px; margin-top: 30px; text-transform: uppercase; letter-spacing: 1px;
+            font-family: 'Cinzel', serif;
+        }
+
+        p, li { color: #ccc; font-size: 1.1rem; line-height: 1.5; }
         ol { margin-left: 20px; }
         li { margin-bottom: 12px; }
+
+        /* Timer Style */
+        #timer-display {
+            position: fixed; top: 20px; right: 20px;
+            background-color: #000; color: #fff;
+            padding: 10px 15px; border-radius: 5px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.2rem; font-weight: bold;
+            box-shadow: 0 0 10px var(--accent-color);
+            z-index: 100; border: 1px solid var(--accent-color);
+        }
+        .timer-warning { background-color: var(--accent-color) !important; color: #000 !important; animation: blink 0.5s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+        
+        mjx-container { color: #fff !important; }
     </style>
 </head>
 <body>
 
-<div id="timer-display">
-    Temps restant: <span id="time">02:00:00</span>
-</div>
+    <audio id="boot-audio" src="xbox-startup.mp3"></audio>
+    <audio id="vecna-sound" src="vecnalives.mp3"></audio>
 
-<audio id="vecna-sound" preload="auto">
-    <source src="https://actions.google.com/sounds/v1/horror/horror_bell.ogg" type="audio/ogg">
-</audio>
+    <div id="tap-overlay" onclick="runSignatureBoot()">
+        <div class="tap-msg">> SYSTEM LOCK. TAP TO OPEN. <</div>
+    </div>
 
-<table class="header-table">
-    <tr>
-        <td>Prof : Kawtar Elmo<br>Niveau : T C S F</td>
-        <td>Devoir à domicile<br>N° 3</td>
-        <td>Lycée ALMAJED<br>Année Scolaire : 2025/2026</td>
-    </tr>
-</table>
+    <div id="signature-boot" style="display:none;">
+        <div class="fog-layer"></div>
+        <div class="intro-container" id="intro-container">
+            <div class="neon-text" id="neon-text">EZHER</div>
+            <div class="neon-sub">DESIGNED & PUBLISHED</div>
+        </div>
+    </div>
 
-<h3>Exercice 1</h3>
+    <div id="main-content">
+        
+        <div id="timer-display">
+            Temps restant: <span id="time">02:00:00</span>
+        </div>
 
-<p>On considère le polynôme suivant : $p(x) = x^3 + x^2 - 10x + 8$</p>
+        <table class="header-table">
+            <tr>
+                <td>Prof : Kawtar Elmo<br>Niveau : T C S F</td>
+                <td>Devoir à domicile<br>N° 3 (Ezher Edition)</td>
+                <td>Lycée ALMAJED<br>Année Scolaire : 2025/2026</td>
+            </tr>
+        </table>
 
-<ol>
-    <li>Montrer que $x = 1$ est une racine de $p(x)$.</li>
-    <li>Déterminer par la division euclidienne le polynôme $Q(x)$ tel que :<br>
-        $$p(x) = (x - 1)Q(x)$$</li>
-    <li>Résoudre dans $\mathbb{R}$ l'équation : $Q(x) = 0$.</li>
-    <li>
-        a) Factoriser dans $\mathbb{R}$ le polynôme suivant $Q(x)$.<br>
-        b) Déduire une factorisation de $p(x)$ sous forme des binômes du 1er degré.
-    </li>
-    <li>
-        a) Donner le tableau de signe du polynôme $p(x)$.<br>
-        b) Déduire l'ensemble des solutions de l'inéquation $p(x) \leq 0$.
-    </li>
-    <li>Résoudre par la méthode de « Cramer » le système suivant :
-        $$
-        \begin{cases} 
-        2x - y = 4 \\
-        3x + 4y = 17
-        \end{cases}
-        $$
-    </li>
-</ol>
+        <h3>Exercice 1</h3>
+        <p>Soit le polynôme $P(x)$ défini par : $P(x) = x^3 - 4x^2 + x + 6$</p>
 
-<h3>Exercice 2</h3>
+        <ol>
+            <li>Vérifier par le calcul que l'image de 2 par la fonction polynomiale $P$ est nulle.</li>
+            <li>En utilisant la division euclidienne, trouver le trinôme $Q(x)$ tel que $P(x) = (x - 2)Q(x)$.</li>
+            <li>
+                a) Déterminer les racines du trinôme $Q(x)$.<br>
+                b) En déduire l'écriture factorisée de $P(x)$ en produit de facteurs de premier degré.
+            </li>
+            <li>
+                <strong>Question subsidiaire :</strong> Trouver les réels $x$ tels que $P(x) = 6$.
+            </li>
+            <li>Établir le tableau de signes de $P(x)$ puis donner l'ensemble solution de $P(x) \geq 0$.</li>
+        </ol>
 
-<ol>
-    <li>Déterminer l'abscisse curviligne principale des points suivants : $A\left(\frac{49\pi}{3}\right)$ et $B\left(-\frac{37\pi}{4}\right)$ et $C\left(\frac{61\pi}{6}\right)$.</li>
-    <li>Placer les points A, B, et C sur le cercle trigonométrique.</li>
-</ol>
+        <h3>Exercice 2</h3>
+        <ol>
+            <li>On considère le système linéaire suivant :
+                $$
+                (S) : \begin{cases} 
+                2x - y = 4 \\
+                3x + 4y = 17
+                \end{cases}
+                $$
+                Utiliser la règle de Cramer pour déterminer le couple $(x, y)$ solution de $(S)$.
+            </li>
+            <li>
+                <strong>Question subsidiaire :</strong> Pour quelle valeur du paramètre $m$, le déterminant du système suivant s'annule-t-il ?
+                $$
+                \begin{cases} 
+                mx + 2y = 1 \\
+                3x + y = 5
+                \end{cases}
+                $$
+            </li>
+        </ol>
 
-<script>
-    // TIMER SCRIPT (2 HOURS)
-    let totalTime = 2 * 60 * 60; // 7200 seconds
-    
-    const timerDisplay = document.getElementById('time');
-    const timerBox = document.getElementById('timer-display');
-    const audio = document.getElementById('vecna-sound');
-    let soundPlayed = false;
+        <h3>Exercice 3</h3>
+        <ol>
+            <li>Identifier l'abscisse curviligne principale associée à chacun des angles suivants : 
+                $A(\frac{49\pi}{3})$, $B(-\frac{37\pi}{4})$ et $C(\frac{61\pi}{6})$.
+            </li>
+            <li>Représenter graphiquement les images de ces réels sur le cercle trigonométrique.</li>
+        </ol>
 
-    // Helper: Unlock audio on first click
-    document.body.addEventListener('click', function() {
-        if(audio.paused) { audio.load(); }
-    }, {once:true});
+    </div>
 
-    function updateTimer() {
-        let hours = Math.floor(totalTime / 3600);
-        let minutes = Math.floor((totalTime % 3600) / 60);
-        let seconds = totalTime % 60;
+    <script>
+        // --- 1. INTRO SCRIPT ---
+        function runSignatureBoot() {
+            const tapOverlay = document.getElementById('tap-overlay');
+            tapOverlay.style.opacity = '0';
+            setTimeout(() => tapOverlay.style.display = 'none', 500);
 
-        hours = hours < 10 ? '0' + hours : hours;
-        minutes = minutes < 10 ? '0' + minutes : minutes;
-        seconds = seconds < 10 ? '0' + seconds : seconds;
+            const boot = document.getElementById('signature-boot');
+            boot.style.display = 'flex';
 
-        timerDisplay.textContent = `${hours}:${minutes}:${seconds}`;
+            const audio = document.getElementById('boot-audio');
+            if(audio) { 
+                audio.volume = 1.0; 
+                audio.play().catch(e => console.log("Intro Audio Error:", e)); 
+            }
 
-        // PLAY SOUND AT 24 SECONDS REMAINING
-        if (totalTime === 24 && !soundPlayed) {
-            audio.play().catch(e => console.log("Audio blocked:", e));
-            timerBox.style.backgroundColor = '#b71c1c'; // Red Alert
-            soundPlayed = true;
+            setTimeout(() => { document.getElementById('neon-text').classList.add('active'); }, 4000); 
+
+            setTimeout(() => {
+                document.getElementById('intro-container').classList.add('morph-active');
+                setTimeout(() => {
+                    boot.style.display = 'none';
+                    const main = document.getElementById('main-content');
+                    main.style.display = 'block';
+                    void main.offsetWidth; 
+                    main.style.opacity = '1';
+                    document.body.style.overflow = 'auto';
+
+                    // START EXAM TIMER
+                    startExamTimer();
+                }, 2000); 
+            }, 8000); 
         }
 
-        if (totalTime <= 0) {
-            clearInterval(interval);
-            timerDisplay.textContent = "00:00:00 - FIN";
-            alert("Le temps est écoulé !");
-        } else {
-            totalTime--;
-        }
-    }
-    const interval = setInterval(updateTimer, 1000);
-    updateTimer();
-</script>
+        // --- 2. COMPLEX TIMER SCRIPT ---
+        function startExamTimer() {
+            let totalTime = 2 * 60 * 60; // 7200 seconds (2h)
+            const timerDisplay = document.getElementById('time');
+            const timerBox = document.getElementById('timer-display');
+            const vecnaAudio = document.getElementById('vecna-sound');
 
+            // Play START sound (2h remaining)
+            vecnaAudio.play().catch(e => console.log("Exam Start Audio Error:", e));
+
+            const interval = setInterval(() => {
+                let hours = Math.floor(totalTime / 3600);
+                let minutes = Math.floor((totalTime % 3600) / 60);
+                let seconds = totalTime % 60;
+
+                hours = hours < 10 ? '0' + hours : hours;
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                seconds = seconds < 10 ? '0' + seconds : seconds;
+
+                timerDisplay.textContent = `${hours}:${minutes}:${seconds}`;
+
+                // --- SOUND TRIGGERS ---
+                // 1h30 remaining (5400s)
+                if (totalTime === 5400) { 
+                    vecnaAudio.currentTime = 0; 
+                    vecnaAudio.play(); 
+                }
+                // 1h remaining (3600s)
+                if (totalTime === 3600) { 
+                    vecnaAudio.currentTime = 0; 
+                    vecnaAudio.play(); 
+                }
+                // 30min remaining (1800s)
+                if (totalTime === 1800) { 
+                    vecnaAudio.currentTime = 0; 
+                    vecnaAudio.play(); 
+                    timerBox.style.borderColor = "orange";
+                }
+                // 25s remaining
+                if (totalTime === 25) { 
+                    vecnaAudio.currentTime = 0; 
+                    vecnaAudio.play(); 
+                    timerBox.classList.add('timer-warning');
+                }
+
+                if (totalTime <= 0) {
+                    clearInterval(interval);
+                    timerDisplay.textContent = "00:00:00 - FIN";
+                    alert("Fin de l'épreuve !");
+                } else {
+                    totalTime--;
+                }
+            }, 1000);
+        }
+    </script>
 </body>
 </html>
