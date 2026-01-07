@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devoir à Domicile N°3 - Variante 1</title>
+    
+    <script>
+      window.MathJax = {
+        tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+      };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body { font-family: 'Times New Roman', serif; padding: 40px; max-width: 800px; margin: 0 auto; line-height: 1.5; }
+        
+        /* TIMER STYLE */
+        #timer-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #222;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 1000;
+            border: 2px solid #000;
+        }
+        .timer-warning { background-color: #b71c1c !important; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        @media print { #timer-display { display: none; } }
+
+        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; text-align: center; border: 2px solid black; }
+        .header-table td { border: 1px solid black; padding: 10px; font-weight: bold; }
+        h3 { text-decoration: underline; text-align: center; margin-top: 30px; }
+        ol { margin-left: 20px; }
+        li { margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+
+<div id="timer-display">
+    Temps restant: <span id="time">02:00:00</span>
+</div>
+
+<audio id="vecna-sound" preload="auto">
+    <source src="https://actions.google.com/sounds/v1/horror/horror_bell.ogg" type="audio/ogg">
+</audio>
+
+<table class="header-table">
+    <tr>
+        <td>Prof : Kawtar Elmo<br>Niveau : T C S F</td>
+        <td>Devoir à domicile<br>N° 3</td>
+        <td>Lycée ALMAJED<br>Année Scolaire : 2025/2026</td>
+    </tr>
+</table>
+
+<h3>Exercice 1</h3>
+
+<p>On considère le polynôme suivant : $p(x) = x^3 + x^2 - 10x + 8$</p>
+
+<ol>
+    <li>Montrer que $x = 1$ est une racine de $p(x)$.</li>
+    <li>Déterminer par la division euclidienne le polynôme $Q(x)$ tel que :<br>
+        $$p(x) = (x - 1)Q(x)$$</li>
+    <li>Résoudre dans $\mathbb{R}$ l'équation : $Q(x) = 0$.</li>
+    <li>
+        a) Factoriser dans $\mathbb{R}$ le polynôme suivant $Q(x)$.<br>
+        b) Déduire une factorisation de $p(x)$ sous forme des binômes du 1er degré.
+    </li>
+    <li>
+        a) Donner le tableau de signe du polynôme $p(x)$.<br>
+        b) Déduire l'ensemble des solutions de l'inéquation $p(x) \leq 0$.
+    </li>
+    <li>Résoudre par la méthode de « Cramer » le système suivant :
+        $$
+        \begin{cases} 
+        2x - y = 4 \\
+        3x + 4y = 17
+        \end{cases}
+        $$
+    </li>
+</ol>
+
+<h3>Exercice 2</h3>
+
+<ol>
+    <li>Déterminer l'abscisse curviligne principale des points suivants : $A\left(\frac{49\pi}{3}\right)$ et $B\left(-\frac{37\pi}{4}\right)$ et $C\left(\frac{61\pi}{6}\right)$.</li>
+    <li>Placer les points A, B, et C sur le cercle trigonométrique.</li>
+</ol>
+
+<script>
+    // TIMER SCRIPT (2 HOURS)
+    let totalTime = 2 * 60 * 60; // 7200 seconds
+    
+    const timerDisplay = document.getElementById('time');
+    const timerBox = document.getElementById('timer-display');
+    const audio = document.getElementById('vecna-sound');
+    let soundPlayed = false;
+
+    // Helper: Unlock audio on first click
+    document.body.addEventListener('click', function() {
+        if(audio.paused) { audio.load(); }
+    }, {once:true});
+
+    function updateTimer() {
+        let hours = Math.floor(totalTime / 3600);
+        let minutes = Math.floor((totalTime % 3600) / 60);
+        let seconds = totalTime % 60;
+
+        hours = hours < 10 ? '0' + hours : hours;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+
+        timerDisplay.textContent = `${hours}:${minutes}:${seconds}`;
+
+        // PLAY SOUND AT 24 SECONDS REMAINING
+        if (totalTime === 24 && !soundPlayed) {
+            audio.play().catch(e => console.log("Audio blocked:", e));
+            timerBox.style.backgroundColor = '#b71c1c'; // Red Alert
+            soundPlayed = true;
+        }
+
+        if (totalTime <= 0) {
+            clearInterval(interval);
+            timerDisplay.textContent = "00:00:00 - FIN";
+            alert("Le temps est écoulé !");
+        } else {
+            totalTime--;
+        }
+    }
+    const interval = setInterval(updateTimer, 1000);
+    updateTimer();
+</script>
+
+</body>
+</html>
